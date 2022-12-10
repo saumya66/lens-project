@@ -143,7 +143,7 @@ export default function WithSubnavigation({profile,connected,setUserProfile,setC
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align="center">
           <Logo width="36" height="36" />
           <Flex display={{ base: 'none', md: 'flex' }} ml={10} >
-            <DesktopNav />
+            <DesktopNav profileHandle={profile?.handle ? profile?.handle : 'signed in'}/>
           </Flex>
         </Flex>
 
@@ -152,7 +152,6 @@ export default function WithSubnavigation({profile,connected,setUserProfile,setC
           justify={'flex-end'}
           direction={'row'}
           spacing={6}>
-            {profile && console.log(profile)}
           <Button
             display={{ base: 'none', md: 'inline-flex' }}
             fontSize={'lg'}
@@ -164,19 +163,19 @@ export default function WithSubnavigation({profile,connected,setUserProfile,setC
             }}
             onClick ={ !connected && signIn }>
             {
-             connected ? `signedin` : "sign in"
+             connected ? `${profile?.handle}` : "sign in"
             }
           </Button>
         </Stack>
       </Flex>
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav profileId={profile?.id}/>
       </Collapse>
     </Box>
   );
 }
 
-const DesktopNav = () => {
+const DesktopNav = ({profileId}) => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const popoverContentBgColor = useColorModeValue('white', 'gray.800');
@@ -189,7 +188,7 @@ const DesktopNav = () => {
             <PopoverTrigger>
               <Link
                 p={2}
-                onClick = {()=>router.push(navItem?.href ? navItem.href : '/404')}
+                onClick = {()=>router.push(navItem?.href=='/profile' ? `/profile/${profileId}` : navItem?.href ? navItem.href : '/404')}
                 fontSize={'lg'}
                 fontWeight={500}
                 color={linkColor}
@@ -223,54 +222,21 @@ const DesktopNav = () => {
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }) => {
-  return (
-    <Link
-      href={href}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('purple.50', 'gray.900') }}>
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text
-            transition={'all .3s ease'}
-            _groupHover={{ color: 'pink.400' }}
-            fontWeight={500}>
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}>
-          <Icon color={'pink.400'} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
-  );
-};
 
-const MobileNav = () => {
+const MobileNav = ({profileId}) => {
   return (
     <Stack
-      bg={useColorModeValue('white', 'gray.800')}
+    bg={useColorModeValue('white', 'gray.800')}
       p={4}
       display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
+        <MobileNavItem key={navItem.label} {...navItem} profileId={profileId} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }) => {
+const MobileNavItem = ({ label, children, href,profileId }) => {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -278,7 +244,7 @@ const MobileNavItem = ({ label, children, href }) => {
       <Flex
         py={2}
         as={Link}
-        href={href ?? '#'}
+        href={href=='/profile' ? `/profile/${profileId}` : href ? href : '/404'}
         justify={'space-between'}
         align={'center'}
         _hover={{
@@ -320,6 +286,39 @@ const MobileNavItem = ({ label, children, href }) => {
   );
 };
 
+const DesktopSubNav = ({ label, href, subLabel }) => {
+  return (
+    <Link
+      href={href}
+      role={'group'}
+      display={'block'}
+      p={2}
+      rounded={'md'}
+      _hover={{ bg: useColorModeValue('purple.50', 'gray.900') }}>
+      <Stack direction={'row'} align={'center'}>
+        <Box>
+          <Text
+            transition={'all .3s ease'}
+            _groupHover={{ color: 'pink.400' }}
+            fontWeight={500}>
+            {label}
+          </Text>
+          <Text fontSize={'sm'}>{subLabel}</Text>
+        </Box>
+        <Flex
+          transition={'all .3s ease'}
+          transform={'translateX(-10px)'}
+          opacity={0}
+          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
+          justify={'flex-end'}
+          align={'center'}
+          flex={1}>
+          <Icon color={'pink.400'} w={5} h={5} as={ChevronRightIcon} />
+        </Flex>
+      </Stack>
+    </Link>
+  );
+};
 
 
 
